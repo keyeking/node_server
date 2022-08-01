@@ -1,3 +1,4 @@
+// res.send中间件封装
 const ysend = (req, res, next) => {
   // status = 0 为成功； status = 1 为失败； 默认将 status 的值设置为 1，
   res.ysend = (err, status = 1) => {

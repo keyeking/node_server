@@ -1,7 +1,14 @@
+/**
+ * @注册
+ */
+
 // 导入数据库
-const db = require('../../mysql/index')
+const db = require('../../utils/mysql')
 // 导入对密码加密模块
 const bcrypt = require('bcryptjs')
+// 导入账号验证模块
+const reg = require('../../utils/regex')
+
 // 注册
 const register = (req, res) => {
   // 获取传入的json数据
@@ -9,6 +16,10 @@ const register = (req, res) => {
   // 判断是否为空
   if (!userinfo.username || !userinfo.password) {
     return res.ysend('用户名或者密码不能为空')
+  }
+  // 判断是否合法
+  if (!reg.regPhone(userinfo.username) || !reg.regPhone(userinfo.password)) {
+    return res.ysend('用户名不合法')
   }
   // 检查用户名是否被占用
   db.getConnection((err, connection) => {
@@ -44,22 +55,4 @@ const register = (req, res) => {
     connection.release()
   })
 }
-// 登录
-const login = (req, res) => {
-  res.send('login')
-}
-// 重置
-const resetPassword = (req, res) => {
-  res.send('resetPassword')
-}
-// 删除
-const delUser = (req, res) => {
-  res.send('delUser')
-}
-const loginHandler = {
-  register,
-  login,
-  resetPassword,
-  delUser
-}
-module.exports = loginHandler
+module.exports = register
