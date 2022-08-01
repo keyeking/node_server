@@ -1,23 +1,65 @@
+// 导入数据库
+const db = require('../../mysql/index')
+// 导入对密码加密模块
+const bcrypt = require('bcryptjs')
 // 注册
 const register = (req, res) => {
-  res.send("register");
-};
+  // 获取传入的json数据
+  const userinfo = req.body
+  // 判断是否为空
+  if (!userinfo.username || !userinfo.password) {
+    return res.send({ status: 1, msg: '用户名或者密码不能为空' })
+  }
+  // 检查用户名是否被占用
+  db.getConnection((err, connection) => {
+    if (err) {
+      return res.send(err)
+    }
+    // 定义查询用户名的语句
+    const sql = 'select * from login where username=?'
+    connection.query(sql, userinfo.username, (err, result) => {
+      if (err) {
+        return res.send(err)
+      }
+      if (result.length > 0) {
+        return res.send({ status: 1, msg: '用户名已被使用，请重新输入用户名' })
+      }
+      // 对密码进行加密，随机盐的长度为10
+      userinfo.password = bcrypt.hashSync(userinfo.password, 10)
+      // 将用户写入到数据库中
+      const sql = 'insert into login set?'
+      connection.query(sql, userinfo, (err, result) => {
+        if (err) {
+          result.send(err)
+        }
+        //SQL 语句执行成功，但影响行数不为 1
+        if (result.affectedRows !== 1) {
+          return res.send({ status: 1, msg: '注册用户失败，请稍后再试！' })
+        }
+        // 注册成功
+        res.send({ status: 0, message: '注册成功！' })
+      })
+    })
+    // 缓存到连接池中
+    connection.release()
+  })
+}
 // 登录
 const login = (req, res) => {
-  res.send("login");
-};
+  res.send('login')
+}
 // 重置
 const resetPassword = (req, res) => {
-  res.send("resetPassword");
-};
+  res.send('resetPassword')
+}
 // 删除
 const delUser = (req, res) => {
-  res.send("delUser");
-};
+  res.send('delUser')
+}
 const loginHandler = {
   register,
   login,
   resetPassword,
-  delUser,
-};
-module.exports = loginHandler;
+  delUser
+}
+module.exports = loginHandler

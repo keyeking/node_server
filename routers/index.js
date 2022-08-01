@@ -1,6 +1,6 @@
-const loginRoute = require("./login/login");
+const loginRoute = require('./login/login')
 
 function route(app) {
-  app.use("/api", loginRoute);
+  app.use('/api', loginRoute)
 }
-module.exports = route;
+module.exports = route
