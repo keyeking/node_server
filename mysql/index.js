@@ -1,3 +1,4 @@
+//连接数据库模块
 const mysql = require('mysql')
 const db = mysql.createPool({
   host: 'localhost',

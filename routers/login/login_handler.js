@@ -8,21 +8,21 @@ const register = (req, res) => {
   const userinfo = req.body
   // 判断是否为空
   if (!userinfo.username || !userinfo.password) {
-    return res.send({ status: 1, msg: '用户名或者密码不能为空' })
+    return res.ysend('用户名或者密码不能为空')
   }
   // 检查用户名是否被占用
   db.getConnection((err, connection) => {
     if (err) {
-      return res.send(err)
+      return res.ysend(err)
     }
     // 定义查询用户名的语句
     const sql = 'select * from login where username=?'
     connection.query(sql, userinfo.username, (err, result) => {
       if (err) {
-        return res.send(err)
+        return res.ysend(err)
       }
       if (result.length > 0) {
-        return res.send({ status: 1, msg: '用户名已被使用，请重新输入用户名' })
+        return res.ysend('用户名已被使用，请重新输入用户名')
       }
       // 对密码进行加密，随机盐的长度为10
       userinfo.password = bcrypt.hashSync(userinfo.password, 10)
@@ -30,14 +30,14 @@ const register = (req, res) => {
       const sql = 'insert into login set?'
       connection.query(sql, userinfo, (err, result) => {
         if (err) {
-          result.send(err)
+          result.ysend(err)
         }
         //SQL 语句执行成功，但影响行数不为 1
         if (result.affectedRows !== 1) {
-          return res.send({ status: 1, msg: '注册用户失败，请稍后再试！' })
+          return res.ysend('注册用户失败，请稍后再试！')
         }
         // 注册成功
-        res.send({ status: 0, message: '注册成功！' })
+        res.ysend('注册成功！', 0)
       })
     })
     // 缓存到连接池中
